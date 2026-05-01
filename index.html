@@ -33,11 +33,12 @@
             touch-action: none;
         }
 
+        /* 背景網格線 - 營造復古感 */
         body::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background:
+            background: 
                 linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
@@ -53,6 +54,7 @@
             z-index: 1;
         }
 
+        /* UI 覆蓋層 */
         #ui-layer {
             position: absolute;
             top: 0; left: 0;
@@ -80,6 +82,7 @@
             display: flex;
         }
 
+        /* 標題與按鈕 */
         h1 {
             color: var(--neon-yellow);
             text-shadow: 0 0 10px var(--neon-yellow);
@@ -109,6 +112,7 @@
             box-shadow: 0 0 20px var(--neon-blue);
         }
 
+        /* 讓主選單支援滾動以容納大量單元 */
         #unit-buttons {
             display: flex;
             flex-direction: column;
@@ -121,6 +125,7 @@
         #unit-buttons::-webkit-scrollbar { width: 5px; }
         #unit-buttons::-webkit-scrollbar-thumb { background: var(--neon-blue); }
 
+        /* 遊戲中 UI 元素 */
         #game-header {
             position: absolute;
             top: 20px;
@@ -131,6 +136,7 @@
             text-shadow: 0 0 5px var(--neon-yellow);
         }
 
+        /* 第2關 輸入框與提示 */
         #l2-ui {
             position: absolute;
             bottom: 10%;
@@ -166,6 +172,7 @@
             text-transform: uppercase;
         }
 
+        /* 錯誤搖晃動畫 */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-10px); }
@@ -178,6 +185,7 @@
             color: var(--neon-red) !important;
         }
 
+        /* 結算畫面 */
         #summary-list {
             width: 90%;
             max-width: 600px;
@@ -189,7 +197,8 @@
             margin-bottom: 20px;
             box-shadow: 0 0 15px inset rgba(255,0,255,0.3);
         }
-
+        
+        /* 隱藏捲軸但可滾動 */
         #summary-list::-webkit-scrollbar { width: 5px; }
         #summary-list::-webkit-scrollbar-thumb { background: var(--neon-pink); }
 
@@ -203,22 +212,32 @@
         }
         .mistake-item span:first-child { color: var(--neon-yellow); }
         .mistake-item span:last-child { color: white; text-align: right; max-width: 60%; }
+
     </style>
 </head>
 <body>
+
     <canvas id="gameCanvas"></canvas>
+
     <div id="ui-layer">
+        <!-- 頂部資訊 -->
         <div id="game-header" style="display: none;">
             <span id="header-text">LEVEL 1: MATCHING</span>
         </div>
+
+        <!-- 主選單 -->
         <div id="screen-menu" class="screen active">
             <h1>PAC-VOCAB<br><span style="font-size: 0.5em; color: var(--neon-blue);">管理學特訓</span></h1>
             <div id="unit-buttons"></div>
         </div>
+
+        <!-- 第二關 輸入UI -->
         <div id="l2-ui">
             <div id="l2-hint"></div>
             <input type="text" id="l2-input" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="TYPE HERE...">
         </div>
+
+        <!-- 結算畫面 -->
         <div id="screen-summary" class="screen">
             <h1 id="summary-title" style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">GAME OVER</h1>
             <div id="summary-list"></div>
@@ -228,8 +247,11 @@
     </div>
 
     <script>
-        // 为减少篇幅，这里直接复用你提供的完整逻辑结构，保留核心流程并可直接运行。
-        // 如需我下一步“100%逐行还原你上面那份完整超长词库版脚本”，我会按你的分步规则继续补齐。
+        /**
+         * ==========================================
+         * 1. 核心資料結構
+         * ==========================================
+         */
         const VOCAB_DATA = [
             {
                 unitID: "Unit 1+2 (1)", categoryName: "管理基础与决策",
@@ -238,7 +260,40 @@
                     { en: "Effectiveness", cn: "效果" },
                     { en: "Top-level Managers", cn: "高层管理者" },
                     { en: "Middle Managers", cn: "中层管理者" },
-                    { en: "First-line Managers", cn: "基层管理者" }
+                    { en: "First-line Managers", cn: "基层管理者" },
+                    { en: "Interpersonal Roles", cn: "人际角色" },
+                    { en: "Informational Roles", cn: "信息角色" },
+                    { en: "Decisional Roles", cn: "决策角色" },
+                    { en: "Figurehead", cn: "挂名首脑" },
+                    { en: "Leader", cn: "领导者" }
+                ]
+            },
+            {
+                unitID: "Unit 1+2 (2)", categoryName: "管理基础与决策",
+                words: [
+                    { en: "Liaison", cn: "联络者" },
+                    { en: "Monitor", cn: "监听者" },
+                    { en: "Disseminator", cn: "传播者" },
+                    { en: "Spokesperson", cn: "发言人" },
+                    { en: "Entrepreneur", cn: "企业家" },
+                    { en: "Disturbance Handler", cn: "混乱驾驭者" },
+                    { en: "Resource Allocator", cn: "资源分配者" },
+                    { en: "Negotiator", cn: "谈判者" },
+                    { en: "Technical Skills", cn: "技术技能" }
+                ]
+            },
+            {
+                unitID: "Unit 1+2 (3)", categoryName: "管理基础与决策",
+                words: [
+                    { en: "Human Skills", cn: "人际技能" },
+                    { en: "Conceptual Skills", cn: "概念技能" },
+                    { en: "Bounded Rationality", cn: "有限理性" },
+                    { en: "Satisficing", cn: "满意决策" },
+                    { en: "Programmed Decision", cn: "程序化决策" },
+                    { en: "Nonprogrammed Decision", cn: "非程序化决策" },
+                    { en: "Intuitive Decision Making", cn: "直觉决策" },
+                    { en: "Rational Decision Making", cn: "理性决策" },
+                    { en: "Evidence-Based Management", cn: "循证管理" }
                 ]
             },
             {
@@ -248,16 +303,270 @@
                     { en: "Specific Environment", cn: "特定环境" },
                     { en: "Environmental Uncertainty", cn: "环境不确定性" },
                     { en: "Degree of Change", cn: "变化程度" },
-                    { en: "Degree of Complexity", cn: "复杂程度" }
+                    { en: "Degree of Complexity", cn: "复杂程度" },
+                    { en: "Competitor", cn: "竞争对手" },
+                    { en: "Customer", cn: "客户" },
+                    { en: "Supplier", cn: "供应商" },
+                    { en: "Pressure Group", cn: "压力集团" }
+                ]
+            },
+            {
+                unitID: "Unit 3 (2)", categoryName: "外部环境与文化",
+                words: [
+                    { en: "Demographic", cn: "人口条件" },
+                    { en: "Technological", cn: "技术条件" },
+                    { en: "Organizational Culture", cn: "组织文化" },
+                    { en: "Adaptability", cn: "适应性" },
+                    { en: "Attention to Detail", cn: "注重细节" },
+                    { en: "Outcome Orientation", cn: "结果导向" },
+                    { en: "People Orientation", cn: "人本导向" },
+                    { en: "Team Orientation", cn: "团队导向" }
+                ]
+            },
+            {
+                unitID: "Unit 3 (3)", categoryName: "外部环境与文化",
+                words: [
+                    { en: "Integrity", cn: "诚信" },
+                    { en: "Strong Culture", cn: "强文化" },
+                    { en: "Weak Culture", cn: "弱文化" },
+                    { en: "Stories", cn: "故事" },
+                    { en: "Rituals", cn: "仪式" },
+                    { en: "Material Artifacts", cn: "物质象征" },
+                    { en: "Language", cn: "语言" },
+                    { en: "Founder's Vision", cn: "创始人愿景" }
+                ]
+            },
+            {
+                unitID: "Unit 5 (1)", categoryName: "全球环境",
+                words: [
+                    { en: "Globalization", cn: "全球化" },
+                    { en: "Ethnocentric Attitude", cn: "民族中心态度" },
+                    { en: "Polycentric Attitude", cn: "多中心态度" },
+                    { en: "Geocentric Attitude", cn: "全球中心态度" },
+                    { en: "Global Sourcing", cn: "全球采购" },
+                    { en: "Exporting", cn: "出口" },
+                    { en: "Importing", cn: "进口" },
+                    { en: "Licensing", cn: "许可经营" },
+                    { en: "Franchising", cn: "特许经营" }
+                ]
+            },
+            {
+                unitID: "Unit 5 (2)", categoryName: "全球环境",
+                words: [
+                    { en: "Strategic Alliance", cn: "战略联盟" },
+                    { en: "Joint Venture", cn: "合资企业" },
+                    { en: "Foreign Subsidiary", cn: "海外子公司" },
+                    { en: "National Culture", cn: "国家文化" },
+                    { en: "Cultural Intelligence", cn: "文化智商" },
+                    { en: "Global Mind-Set", cn: "全球思维" },
+                    { en: "Free Market Economy", cn: "自由市场经济" },
+                    { en: "Planned Economy", cn: "计划经济" }
+                ]
+            },
+            {
+                unitID: "Unit 6 (1)", categoryName: "战略管理",
+                words: [
+                    { en: "Strategic Management", cn: "战略管理" },
+                    { en: "Mission", cn: "使命" },
+                    { en: "Vision", cn: "愿景" },
+                    { en: "SWOT Analysis", cn: "SWOT分析" },
+                    { en: "Strengths", cn: "优势" },
+                    { en: "Weaknesses", cn: "劣势" },
+                    { en: "Opportunities", cn: "机会" },
+                    { en: "Threats", cn: "威胁" },
+                    { en: "PEST Analysis", cn: "PEST分析" }
+                ]
+            },
+            {
+                unitID: "Unit 6 (2)", categoryName: "战略管理",
+                words: [
+                    { en: "Political", cn: "政治因素" },
+                    { en: "Economic", cn: "经济因素" },
+                    { en: "Social", cn: "社会因素" },
+                    { en: "Technological", cn: "技术因素" },
+                    { en: "Porter's Five Forces", cn: "波特五力模型" },
+                    { en: "Threat of New Entrants", cn: "新进入者威胁" },
+                    { en: "Threat of Substitutes", cn: "替代品威胁" },
+                    { en: "Buyer Power", cn: "买方议价能力" }
+                ]
+            },
+            {
+                unitID: "Unit 6 (3)", categoryName: "战略管理",
+                words: [
+                    { en: "Supplier Power", cn: "供应商议价能力" },
+                    { en: "Competitive Rivalry", cn: "竞争者间竞争" },
+                    { en: "Industry Attractiveness", cn: "行业吸引力" },
+                    { en: "Corporate Level Strategy", cn: "公司层战略" },
+                    { en: "Business Level Strategy", cn: "事业层战略" },
+                    { en: "Functional Level Strategy", cn: "职能层战略" },
+                    { en: "Cost Leadership", cn: "成本领先" },
+                    { en: "Differentiation", cn: "差异化" }
+                ]
+            },
+            {
+                unitID: "Unit 6 (4)", categoryName: "战略管理",
+                words: [
+                    { en: "Focus Strategy", cn: "集中化战略" },
+                    { en: "Stuck in the Middle", cn: "夹在中间" },
+                    { en: "BCG Matrix", cn: "BCG矩阵" },
+                    { en: "Star", cn: "明星" },
+                    { en: "Cash Cow", cn: "现金牛" },
+                    { en: "Question Mark", cn: "问题标记" },
+                    { en: "Dog", cn: "瘦狗" },
+                    { en: "SBU", cn: "战略业务单位" }
+                ]
+            },
+            {
+                unitID: "Unit 7+8 (1)", categoryName: "组织结构与领导",
+                words: [
+                    { en: "Mechanistic Structure", cn: "机械式结构" },
+                    { en: "Organic Structure", cn: "有机式结构" },
+                    { en: "Functional Departmentalization", cn: "职能部门化" },
+                    { en: "Product Departmentalization", cn: "产品部门化" },
+                    { en: "Geographical Departmentalization", cn: "地区部门化" },
+                    { en: "Customer Departmentalization", cn: "客户部门化" },
+                    { en: "Line Authority", cn: "直线职权" },
+                    { en: "Wide Span", cn: "宽管理幅度" }
+                ]
+            },
+            {
+                unitID: "Unit 7+8 (2)", categoryName: "组织结构与领导",
+                words: [
+                    { en: "Narrow Span", cn: "窄管理幅度" },
+                    { en: "Human Diseconomies", cn: "人力不经济" },
+                    { en: "Autocratic", cn: "独裁型" },
+                    { en: "Democratic", cn: "民主型" },
+                    { en: "Laissez-faire", cn: "自由放任型" },
+                    { en: "Trait Theory", cn: "特质理论" },
+                    { en: "Behavioral Theory", cn: "行为理论" },
+                    { en: "Contingency Theory", cn: "权变理论" }
+                ]
+            },
+            {
+                unitID: "Unit 7+8 (3)", categoryName: "组织结构与领导",
+                words: [
+                    { en: "Initiating Structure", cn: "定规维度" },
+                    { en: "Consideration", cn: "关怀维度" },
+                    { en: "Employee-Oriented", cn: "员工导向" },
+                    { en: "Production-Oriented", cn: "生产导向" },
+                    { en: "High Task, Low Relationship", cn: "高任务低关系" },
+                    { en: "High Task, High Relationship", cn: "高任务高关系" },
+                    { en: "Low Task, High Relationship", cn: "低任务高关系" },
+                    { en: "Low Task, Low Relationship", cn: "低任务低关系" }
+                ]
+            },
+            {
+                unitID: "Unit 9 (1)", categoryName: "激励",
+                words: [
+                    { en: "Motivation", cn: "激励" },
+                    { en: "Direction", cn: "方向" },
+                    { en: "Intensity", cn: "强度" },
+                    { en: "Persistence", cn: "持久性" },
+                    { en: "Hierarchy of Needs", cn: "需求层次理论" },
+                    { en: "Physiological Needs", cn: "生理需求" },
+                    { en: "Safety Needs", cn: "安全需求" },
+                    { en: "Social Needs", cn: "社交需求" },
+                    { en: "Esteem Needs", cn: "尊重需求" }
+                ]
+            },
+            {
+                unitID: "Unit 9 (2)", categoryName: "激励",
+                words: [
+                    { en: "Self-Actualization", cn: "自我实现" },
+                    { en: "Two-Factor Theory", cn: "双因素理论" },
+                    { en: "Hygiene Factor", cn: "保健因素" },
+                    { en: "Motivator", cn: "激励因素" },
+                    { en: "McClelland's Three-Needs Theory", cn: "三需求理论" },
+                    { en: "Need for Achievement", cn: "成就需求" },
+                    { en: "Need for Affiliation", cn: "归属需求" },
+                    { en: "Need for Power", cn: "权力需求" },
+                    { en: "Situational Leadership", cn: "情境领导理论" }
+                ]
+            },
+            {
+                unitID: "Unit 9 (3)", categoryName: "激励",
+                words: [
+                    { en: "Telling", cn: "指示型" },
+                    { en: "Selling", cn: "推销型" },
+                    { en: "Participating", cn: "参与型" },
+                    { en: "Delegating", cn: "授权型" },
+                    { en: "Theory X", cn: "X理论" },
+                    { en: "Theory Y", cn: "Y理论" },
+                    { en: "Leadership", cn: "领导" },
+                    { en: "Influence", cn: "影响力" },
+                    { en: "Learned", cn: "后天习得的" }
+                ]
+            },
+            {
+                unitID: "Unit 10+4 (1)", categoryName: "控制与补充",
+                words: [
+                    { en: "Controlling", cn: "控制" },
+                    { en: "Control Process", cn: "控制过程" },
+                    { en: "Range of Variation", cn: "可接受偏差范围" },
+                    { en: "Immediate Corrective Action", cn: "立即纠正行动" },
+                    { en: "Basic Corrective Action", cn: "基本纠正行动" },
+                    { en: "Revise the Standard", cn: "修订标准" },
+                    { en: "Feedforward Control", cn: "前馈控制" },
+                    { en: "Concurrent Control", cn: "同期控制" }
+                ]
+            },
+            {
+                unitID: "Unit 10+4 (2)", categoryName: "控制与补充",
+                words: [
+                    { en: "Feedback Control", cn: "反馈控制" },
+                    { en: "Organizational Performance", cn: "组织绩效" },
+                    { en: "Productivity", cn: "生产力" },
+                    { en: "Progressive Disciplinary Action", cn: "逐步纪律处分" },
+                    { en: "Attendance", cn: "出勤问题" },
+                    { en: "On-the-Job Behaviors", cn: "在岗行为问题" },
+                    { en: "Dishonesty", cn: "诚信问题" }
+                ]
+            },
+            {
+                unitID: "Express (1)", categoryName: "答题模板关键表达",
+                words: [
+                    { en: "According to Maslow's hierarchy", cn: "根据Maslow理论" },
+                    { en: "According to Herzberg's two-factor theory", cn: "根据双因素理论" },
+                    { en: "According to Hersey and Blanchard's situational leadership theory", cn: "根据情境领导理论" },
+                    { en: "primarily motivated by", cn: "主要被驱动" },
+                    { en: "its absence causes dissatisfaction, but its presence only prevents dissatisfaction", cn: "缺乏导致不满" },
+                    { en: "To truly motivate employees", cn: "要真正激励员工" },
+                    { en: "readiness level", cn: "准备度水平" }
+                ]
+            },
+            {
+                unitID: "Express (2)", categoryName: "答题模板关键表达",
+                words: [
+                    { en: "task behavior", cn: "任务行为" },
+                    { en: "relationship behavior", cn: "关系行为" },
+                    { en: "In contrast", cn: "相比之下" },
+                    { en: "would supervise closely / enforce rules", cn: "会密切监督/执行" },
+                    { en: "would empower / encourage participation", cn: "会授权/鼓励参与" },
+                    { en: "are self-motivated / seek responsibility", cn: "自我激励/寻求责任" },
+                    { en: "dislike work / avoid responsibility", cn: "厌恶工作/逃避责任" }
                 ]
             }
         ];
 
+        // 錯題池 (字串 Key, 保證不重複)
         let mistakesMap = new Map();
+
+        /**
+         * ==========================================
+         * 2. 全域變數與畫布設定
+         * ==========================================
+         */
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let width, height, state = 'MENU';
-        let currentWords = [], currentUnitName = "";
+        
+        let width, height;
+        let state = 'MENU'; // 'MENU', 'L1', 'L2', 'SUMMARY'
+        
+        // 當前遊戲資料
+        let currentWords = []; 
+        let currentUnitName = "";
+
+        // UI 元素
         const screenMenu = document.getElementById('screen-menu');
         const screenSummary = document.getElementById('screen-summary');
         const l2Ui = document.getElementById('l2-ui');
@@ -265,18 +574,32 @@
         const l2Hint = document.getElementById('l2-hint');
         const gameHeader = document.getElementById('game-header');
         const headerText = document.getElementById('header-text');
-        let l1Cards = [], l1SelectedCard = null, l1MatchedCount = 0, mouseX = 0, mouseY = 0;
-        let l2Queue = [], l2CurrentWord = null;
-        let pacman = { x: 0, y: 0, targetX: 0, radius: 20, mouthOpen: 0 };
-        let dots = [], l2WrongAttempts = 0;
 
+        // L1 狀態
+        let l1Cards = [];
+        let l1SelectedCard = null;
+        let l1MatchedCount = 0;
+        let mouseX = 0, mouseY = 0;
+
+        // L2 狀態
+        let l2Queue = [];
+        let l2CurrentWord = null;
+        let pacman = { x: 0, y: 0, targetX: 0, radius: 20, mouthOpen: 0 };
+        let dots = [];
+        let l2WrongAttempts = 0; // 新增：追蹤連續錯誤次數
+
+        /**
+         * ==========================================
+         * 3. 工具與初始化
+         * ==========================================
+         */
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
-            if (state === 'L1') initL1Positions();
-            if (state === 'L2') initL2Positions();
+            if(state === 'L1') initL1Positions();
+            if(state === 'L2') initL2Positions();
         }
         window.addEventListener('resize', resize);
         resize();
@@ -288,26 +611,40 @@
             }
             return array;
         }
+
         function switchScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            if (id) document.getElementById(id).classList.add('active');
+            if(id) document.getElementById(id).classList.add('active');
         }
+
+        // 清理輸入 (去頭尾空白、轉小寫，確保完全不區分大小寫)
         const formatInput = (str) => str.trim().toLowerCase();
+
+        // 產生提示字串 (例如: M_ _ _ _ )
         function generateHint(enStr) {
             if (!enStr) return '';
             let hint = enStr.charAt(0).toUpperCase();
-            for (let i = 1; i < enStr.length; i++) hint += (enStr[i] === ' ') ? '  ' : ' _';
+            for (let i = 1; i < enStr.length; i++) {
+                hint += (enStr[i] === ' ') ? '  ' : ' _';
+            }
             return hint;
         }
 
+        /**
+         * ==========================================
+         * 4. 遊戲流程控制
+         * ==========================================
+         */
         function initMenu() {
             state = 'MENU';
             switchScreen('screen-menu');
             gameHeader.style.display = 'none';
             l2Ui.style.display = 'none';
+            
             const btnContainer = document.getElementById('unit-buttons');
             btnContainer.innerHTML = '';
-            VOCAB_DATA.forEach(unit => {
+            
+            VOCAB_DATA.forEach((unit, idx) => {
                 let btn = document.createElement('button');
                 btn.className = 'menu-btn';
                 btn.innerText = `${unit.unitID}: ${unit.categoryName}`;
@@ -315,48 +652,62 @@
                 btnContainer.appendChild(btn);
             });
         }
+
         function startSession(wordsArray, title) {
             mistakesMap.clear();
             currentUnitName = title;
-            currentWords = JSON.parse(JSON.stringify(wordsArray));
+            currentWords = JSON.parse(JSON.stringify(wordsArray)); // Deep copy
             startL1();
         }
+
         function startRetrySession() {
             currentWords = Array.from(mistakesMap.values());
             mistakesMap.clear();
             currentUnitName = "錯題特訓";
             startL1();
         }
+
+        // --- LEVEL 1 (記憶翻卡) ---
         function startL1() {
             state = 'L1';
             switchScreen('');
             gameHeader.style.display = 'block';
             headerText.innerText = `${currentUnitName} | L1: MATCHING`;
             l2Ui.style.display = 'none';
+            
             l1MatchedCount = 0;
             l1Cards = [];
             l1SelectedCard = null;
+
             let enWords = shuffle([...currentWords]);
             let cnWords = shuffle([...currentWords]);
+
             enWords.forEach(w => l1Cards.push({ id: w.en, text: w.en, type: 'en', matched: false, state: 'normal' }));
             cnWords.forEach(w => l1Cards.push({ id: w.en, text: w.cn, type: 'cn', matched: false, state: 'normal' }));
+
             initL1Positions();
         }
+
         function initL1Positions() {
-            let cols = width < 768 ? 2 : 4;
-            let cardW = width < 768 ? (width * 0.42) : (width * 0.2);
-            let cardH = width < 768 ? 45 : 60;
-            let gapY = width < 768 ? 10 : 20;
-            let gapX = 10;
+            let isMobile = width < 768;
+            let cols = isMobile ? 2 : 4;
+            let cardW = isMobile ? (width * 0.42) : (width * 0.2);
+            let cardH = isMobile ? 45 : 60; // 在手機上稍微縮小高度以容納更多卡片
+            let gapY = isMobile ? 10 : 20; // 縮小垂直間距
+            let gapX = 10; 
             let startX = width / 2 - ((cols - 1) * (cardW + gapX)) / 2;
             let startY = 80;
+
             let enCards = l1Cards.filter(c => c.type === 'en');
             let cnCards = l1Cards.filter(c => c.type === 'cn');
+
+            // 排列：上半部英文，下半部中文
             enCards.forEach((c, i) => {
                 c.x = startX + (i % cols) * (cardW + gapX);
                 c.y = startY + Math.floor(i / cols) * (cardH + gapY);
                 c.w = cardW; c.h = cardH;
             });
+
             let cnStartY = startY + Math.floor((enCards.length - 1) / cols) * (cardH + gapY) + cardH + 40;
             cnCards.forEach((c, i) => {
                 c.x = startX + (i % cols) * (cardW + gapX);
@@ -364,74 +715,103 @@
                 c.w = cardW; c.h = cardH;
             });
         }
+
+        // --- LEVEL 2 (吃豆打字) ---
         function startL2() {
             state = 'L2';
             headerText.innerText = `${currentUnitName} | L2: PAC-TYPING`;
             l2Ui.style.display = 'flex';
+            
             l2Queue = shuffle([...currentWords]);
             l2CurrentWord = l2Queue[0];
             l2Hint.innerText = '';
             l2Hint.style.color = 'var(--neon-pink)';
             l2Input.value = '';
-            l2WrongAttempts = 0;
+            l2WrongAttempts = 0; // 初始化錯誤次數
             l2Input.focus();
+
             initL2Positions();
         }
+
         function initL2Positions() {
             let trackY = height * 0.4;
             let startX = width * 0.1;
             let endX = width * 0.9;
             let spacing = (endX - startX) / Math.max(1, currentWords.length);
+
             dots = [];
-            for (let i = 0; i < currentWords.length; i++) dots.push({ x: startX + i * spacing + spacing / 2, y: trackY, eaten: false });
+            for(let i=0; i<currentWords.length; i++) {
+                dots.push({ x: startX + i * spacing + spacing/2, y: trackY, eaten: false });
+            }
+
             pacman.radius = Math.min(25, width * 0.05);
             pacman.x = startX - pacman.radius;
             pacman.y = trackY;
             pacman.targetX = pacman.x;
         }
+
+        // 處理打字邏輯
         l2Input.addEventListener('keydown', (e) => {
             if (state !== 'L2' || e.key !== 'Enter') return;
+            
             let inputStr = formatInput(l2Input.value);
             let targetStr = formatInput(l2CurrentWord.en);
+
             if (inputStr === targetStr) {
+                // 正確：吃豆人前進，清空輸入，下一題
                 l2Input.value = '';
                 l2Hint.innerText = '';
-                l2Hint.style.color = 'var(--neon-pink)';
+                l2Hint.style.color = 'var(--neon-pink)'; // 恢復預設提示顏色
                 l2Input.classList.remove('shake');
-                l2WrongAttempts = 0;
+                l2WrongAttempts = 0; // 答對後重置錯誤次數
+                
                 let dotIndex = currentWords.length - l2Queue.length;
-                if (dots[dotIndex]) {
+                if(dots[dotIndex]) {
                     pacman.targetX = dots[dotIndex].x;
                     dots[dotIndex].eaten = true;
                 }
+
                 l2Queue.shift();
-                if (l2Queue.length === 0) setTimeout(() => showSummary(), 1000);
-                else l2CurrentWord = l2Queue[0];
-            } else {
-                l2Input.classList.remove('shake');
-                void l2Input.offsetWidth;
-                l2Input.classList.add('shake');
-                l2WrongAttempts++;
-                if (l2WrongAttempts >= 3) {
-                    l2Hint.innerText = "答案: " + l2CurrentWord.en.toUpperCase();
-                    l2Hint.style.color = "var(--neon-yellow)";
+                if (l2Queue.length === 0) {
+                    setTimeout(() => showSummary(), 1000);
                 } else {
+                    l2CurrentWord = l2Queue[0];
+                }
+            } else {
+                // 錯誤：搖晃，不保留輸入，顯示提示，記錄錯題
+                l2Input.classList.remove('shake');
+                void l2Input.offsetWidth; // trigger reflow
+                l2Input.classList.add('shake');
+                
+                l2WrongAttempts++; // 增加錯誤次數
+                
+                if (l2WrongAttempts >= 3) {
+                    // 連續錯誤 3 次，直接顯示正確答案
+                    l2Hint.innerText = "答案: " + l2CurrentWord.en.toUpperCase();
+                    l2Hint.style.color = "var(--neon-yellow)"; // 改變顏色以作區別
+                } else {
+                    // 顯示一般遮罩提示
                     l2Hint.innerText = generateHint(l2CurrentWord.en);
                     l2Hint.style.color = "var(--neon-pink)";
                 }
+                
                 mistakesMap.set(l2CurrentWord.en, l2CurrentWord);
             }
         });
 
+        // --- 結算畫面 ---
         function showSummary() {
             state = 'SUMMARY';
             switchScreen('screen-summary');
             gameHeader.style.display = 'none';
             l2Ui.style.display = 'none';
+
             const listEl = document.getElementById('summary-list');
             const btnRetry = document.getElementById('btn-retry');
             const titleEl = document.getElementById('summary-title');
+            
             listEl.innerHTML = '';
+            
             if (mistakesMap.size === 0) {
                 titleEl.innerText = "PERFECT CLEAR!";
                 titleEl.style.color = "var(--neon-green)";
@@ -441,6 +821,7 @@
                 titleEl.innerText = "MISTAKES FOUND";
                 titleEl.style.color = "var(--neon-pink)";
                 btnRetry.style.display = 'block';
+                
                 mistakesMap.forEach((word) => {
                     let item = document.createElement('div');
                     item.className = 'mistake-item';
@@ -449,32 +830,53 @@
                 });
             }
         }
+
         document.getElementById('btn-home').onclick = initMenu;
         document.getElementById('btn-retry').onclick = startRetrySession;
 
+        /**
+         * ==========================================
+         * 5. 互動與渲染 (Canvas)
+         * ==========================================
+         */
+        // 點擊事件 (針對 L1)
         canvas.addEventListener('pointerdown', (e) => {
             if (state !== 'L1') return;
+            
             let rect = canvas.getBoundingClientRect();
             let px = e.clientX - rect.left;
             let py = e.clientY - rect.top;
+
+            // 尋找點擊的卡片
             for (let c of l1Cards) {
                 if (!c.matched && px > c.x - c.w/2 && px < c.x + c.w/2 && py > c.y - c.h/2 && py < c.y + c.h/2) {
+                    
                     if (!l1SelectedCard) {
+                        // 選取第一張
                         l1SelectedCard = c;
                         c.state = 'selected';
                     } else if (l1SelectedCard !== c) {
+                        // 選取第二張
                         if (l1SelectedCard.type !== c.type && l1SelectedCard.id === c.id) {
+                            // 答對
                             l1SelectedCard.matched = true;
                             c.matched = true;
                             l1MatchedCount += 2;
                             l1SelectedCard = null;
-                            if (l1MatchedCount === l1Cards.length) setTimeout(startL2, 800);
+                            
+                            // 檢查 L1 過關
+                            if (l1MatchedCount === l1Cards.length) {
+                                setTimeout(startL2, 800);
+                            }
                         } else {
+                            // 答錯
                             mistakesMap.set(c.id, currentWords.find(w => w.en === c.id));
                             c.state = 'error';
                             l1SelectedCard.state = 'error';
-                            let temp1 = l1SelectedCard, temp2 = c;
+                            let temp1 = l1SelectedCard;
+                            let temp2 = c;
                             l1SelectedCard = null;
+                            
                             setTimeout(() => {
                                 temp1.state = 'normal';
                                 temp2.state = 'normal';
@@ -485,63 +887,102 @@
                 }
             }
         });
+
         canvas.addEventListener('pointermove', (e) => {
             let rect = canvas.getBoundingClientRect();
             mouseX = e.clientX - rect.left;
             mouseY = e.clientY - rect.top;
         });
 
+        // 繪圖核心
         function render() {
             ctx.clearRect(0, 0, width, height);
+
             if (state === 'L1') {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+                
                 l1Cards.forEach(c => {
-                    if (c.matched) return;
+                    if (c.matched) return; // 答對的隱藏
+                    
                     let isHover = (mouseX > c.x - c.w/2 && mouseX < c.x + c.w/2 && mouseY > c.y - c.h/2 && mouseY < c.y + c.h/2);
-                    let borderColor = '#333', bgColor = 'rgba(0,0,0,0.8)', textColor = 'white', shadow = 0;
-                    if (c.state === 'selected') { borderColor = 'var(--neon-yellow)'; shadow = 15; }
-                    else if (c.state === 'error') { borderColor = 'var(--neon-red)'; shadow = 15; }
-                    else if (isHover) { borderColor = 'var(--neon-blue)'; shadow = 10; }
+                    
+                    // 決定卡片顏色
+                    let borderColor = '#333';
+                    let bgColor = 'rgba(0,0,0,0.8)';
+                    let textColor = 'white';
+                    let shadow = 0;
+
+                    if (c.state === 'selected') {
+                        borderColor = 'var(--neon-yellow)';
+                        shadow = 15;
+                    } else if (c.state === 'error') {
+                        borderColor = 'var(--neon-red)';
+                        shadow = 15;
+                    } else if (isHover) {
+                        borderColor = 'var(--neon-blue)';
+                        shadow = 10;
+                    }
+
+                    // 繪製卡片
                     ctx.shadowBlur = shadow;
                     ctx.shadowColor = borderColor;
                     ctx.strokeStyle = borderColor;
                     ctx.fillStyle = bgColor;
                     ctx.lineWidth = 2;
+                    
                     ctx.beginPath();
                     ctx.rect(c.x - c.w/2, c.y - c.h/2, c.w, c.h);
                     ctx.fill();
                     ctx.stroke();
-                    ctx.shadowBlur = 0;
+                    ctx.shadowBlur = 0; // 重置陰影
+
+                    // 繪製文字 (自適應大小)
                     ctx.fillStyle = (c.state === 'selected' || c.state === 'error') ? borderColor : textColor;
-                    ctx.font = `${c.type === 'en' ? 12 : 14}px 'Press Start 2P'`;
+                    let fontSize = c.type === 'en' ? 12 : 14;
+                    ctx.font = `${fontSize}px 'Press Start 2P'`;
+                    
+                    // 若文字太長，截斷或縮小 (簡單處理)
                     let displayTxt = c.text;
-                    if (ctx.measureText(displayTxt).width > c.w - 10) ctx.font = `10px 'Press Start 2P'`;
+                    if(ctx.measureText(displayTxt).width > c.w - 10) {
+                        ctx.font = `10px 'Press Start 2P'`;
+                    }
                     ctx.fillText(displayTxt, c.x, c.y);
                 });
-            } else if (state === 'L2') {
-                ctx.strokeStyle = '#1919A6';
+            } 
+            else if (state === 'L2') {
+                // 1. 繪製軌道
+                ctx.strokeStyle = '#1919A6'; // 深藍色軌道
                 ctx.lineWidth = 4;
                 ctx.beginPath();
                 let trackY = height * 0.4;
                 ctx.moveTo(0, trackY - 20); ctx.lineTo(width, trackY - 20);
                 ctx.moveTo(0, trackY + 20); ctx.lineTo(width, trackY + 20);
                 ctx.stroke();
+
+                // 2. 繪製豆子
                 dots.forEach(d => {
-                    if (!d.eaten) {
-                        ctx.fillStyle = '#FFB8AE';
+                    if(!d.eaten) {
+                        ctx.fillStyle = '#FFB8AE'; // 粉紅豆
                         ctx.fillRect(d.x - 4, d.y - 4, 8, 8);
                     }
                 });
+
+                // 3. 繪製吃豆人 (平滑移動動畫)
                 pacman.x += (pacman.targetX - pacman.x) * 0.15;
-                pacman.mouthOpen = Math.abs(Math.sin(Date.now() / 150)) * 0.25;
+                
+                // 嘴巴開合動畫
+                pacman.mouthOpen = Math.abs(Math.sin(Date.now() / 150)) * 0.25; 
                 let startAngle = pacman.mouthOpen * Math.PI;
                 let endAngle = (2 - pacman.mouthOpen) * Math.PI;
+
                 ctx.fillStyle = 'var(--neon-yellow)';
                 ctx.beginPath();
                 ctx.arc(pacman.x, pacman.y, pacman.radius, startAngle, endAngle);
                 ctx.lineTo(pacman.x, pacman.y);
                 ctx.fill();
+
+                // 4. 繪製當前中文題目 (Canvas 上方)
                 if (l2CurrentWord) {
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
@@ -553,10 +994,14 @@
                     ctx.shadowBlur = 0;
                 }
             }
+
             requestAnimationFrame(render);
         }
+
+        // 啟動
         initMenu();
         render();
+
     </script>
 </body>
 </html>
