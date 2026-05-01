@@ -90,6 +90,7 @@
             line-height: 1.5;
             font-size: clamp(20px, 4vw, 36px);
             margin-bottom: 40px;
+            flex-shrink: 0;
         }
 
         .menu-btn {
@@ -104,6 +105,8 @@
             transition: all 0.2s;
             text-shadow: 0 0 5px var(--neon-blue);
             box-shadow: 0 0 10px inset rgba(0,255,255,0.2), 0 0 10px rgba(0,255,255,0.2);
+            width: 90%;
+            max-width: 600px;
         }
 
         .menu-btn:hover, .menu-btn:active {
@@ -169,7 +172,7 @@
             text-align: center;
             outline: none;
             box-shadow: 0 0 10px var(--neon-blue);
-            text-transform: uppercase;
+            text-transform: uppercase; /* 強制顯示大寫 */
         }
 
         /* 錯誤搖晃動畫 */
@@ -249,7 +252,7 @@
     <script>
         /**
          * ==========================================
-         * 1. 核心資料結構
+         * 1. 核心資料結構 (完整題庫)
          * ==========================================
          */
         const VOCAB_DATA = [
@@ -586,7 +589,7 @@
         let l2CurrentWord = null;
         let pacman = { x: 0, y: 0, targetX: 0, radius: 20, mouthOpen: 0 };
         let dots = [];
-        let l2WrongAttempts = 0; // 新增：追蹤連續錯誤次數
+        let l2WrongAttempts = 0; // 追蹤連續錯誤次數
 
         /**
          * ==========================================
@@ -617,7 +620,7 @@
             if(id) document.getElementById(id).classList.add('active');
         }
 
-        // 清理輸入 (去頭尾空白、轉小寫，確保完全不區分大小寫)
+        // 清理輸入 (去頭尾空白、轉小寫)
         const formatInput = (str) => str.trim().toLowerCase();
 
         // 產生提示字串 (例如: M_ _ _ _ )
